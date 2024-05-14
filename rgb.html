@@ -26,6 +26,8 @@
     <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.4.2/chroma.min.js" integrity="sha512-zInFF17qBFVvvvFpIfeBzo7Tj7+rQxLeTJDmbxjBz5/zIr89YVbTNelNhdTT+/DCrxoVzBeUPVFJsczKbB7sew==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <script>
 
+        function load() {
+
         const myCanvas = document.getElementById("myCanvas");
         const ctx = myCanvas.getContext("2d");
 
@@ -99,7 +101,12 @@
             let color = range * factor
             return chroma.random()
         }
-        setTimeout(() => location.reload(), 1000)
+
+    }
+    load()
+    window.setInterval(function(){
+        load()
+    }, 1000);
     </script>
 
 </body>
