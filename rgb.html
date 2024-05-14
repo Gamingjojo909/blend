@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Art</title>
+    <style>
+        div {
+          display: flex;
+          justify-content: center;
+          align-items: center;
+          text-align: center;
+          min-height: 100vh;
+        }
+
+        canvas {
+
+            width: min(90vw, 90vh)
+}
+    </style>
+</head>
+<body>
+    <div>
+            <canvas id="myCanvas"></canvas> 
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/chroma-js/2.4.2/chroma.min.js" integrity="sha512-zInFF17qBFVvvvFpIfeBzo7Tj7+rQxLeTJDmbxjBz5/zIr89YVbTNelNhdTT+/DCrxoVzBeUPVFJsczKbB7sew==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script>
+
+        const myCanvas = document.getElementById("myCanvas");
+        const ctx = myCanvas.getContext("2d");
+
+        const squareCount = 8
+        const squareSize = 32
+
+        let currentX = squareSize + 1
+        let currentY = squareSize + 1
+
+        myCanvas.setAttribute( "width", squareCount * squareSize * 4 - squareSize )
+        myCanvas.setAttribute( "height", squareCount * squareSize * 4 - squareSize )
+
+        colorArray = []
+
+        //init First colors
+        for (let index = 0; index < squareCount; index++) {
+            colorArray.push(getColorFirst(index , squareCount))
+        }
+
+        //loop
+        let blendMode = false
+        for (let i = 0; i < (squareCount * 2); i++) {
+            currentX = squareSize + 1
+            currentY = squareSize + 1 + (squareSize * i * 2)
+
+            if(blendMode) {
+
+                currentX += squareSize * 2
+                let blendColors = []
+                for (let j = 0; j < squareCount-1; j++) {
+                    ctx.fillStyle = chroma.mix(colorArray[j], colorArray[j + 1]);
+                    blendColors.push(chroma.mix(colorArray[j], colorArray[j + 1]))
+                    ctx.fillRect(currentX, currentY, squareSize, squareSize);
+                    currentX += squareSize*4
+                }
+
+                let newColorArray = []
+                for (let j = 0; j < squareCount; j++) {
+                    if (j == 0) {
+                        //newColorArray.push(chroma.mix(colorArray[j], colorArray[j + 1], 0.25))
+                        newColorArray.push(chroma.blend(colorArray[j], colorArray[j + 1], 'multiply'))
+                    } else if ( j == (squareCount-1)) {
+                        newColorArray.push(chroma.blend(colorArray[j - 1], colorArray[j], 'multiply'))
+                    } else {
+                        let colorA = chroma.mix(colorArray[j - 1], colorArray[j], 0.75)
+                        let colorB = chroma.mix(colorArray[j], colorArray[j + 1], 0.25)
+                        //multiply, darken, lighten, screen, overlay, burn, and dodge.
+                        newColorArray.push(chroma.blend(colorA, colorB, "multiply"))
+                    }
+                }
+                colorArray = newColorArray
+
+            } else {
+                for (let j = 0; j < squareCount; j++) {
+                    ctx.fillStyle = colorArray[j];
+                    ctx.fillRect(currentX, currentY, squareSize, squareSize);
+                    currentX += squareSize*4
+                }
+            }
+
+            blendMode = !blendMode
+        }
+
+        function getColorFirst(index, size) {
+            const startHue = 0
+            const endHue = 100
+
+            const factor = index / (size - 1)
+            const range = endHue - startHue
+
+            let color = range * factor
+            return chroma.random()
+        }
+        setTimeout(() => location.reload(), 1000)
+    </script>
+
+</body>
+</html>
